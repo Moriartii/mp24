@@ -11,10 +11,12 @@ if [ $(/usr/bin/whoami) == "wterminal" ]; then
 	exit 2;
 fi
 
+JSON_PATH="/opt/pp-terminal/conf/config.json"
+
 function check_config_json() {
-		cat /opt/pp-terminal/conf/config.json |grep "terminalId" > /dev/null
+		cat $JSON_PATH |grep "terminalId" > /dev/null
 		id_status1=$? # 0 если есть
-		cat /opt/pp-terminal/conf/config.json |grep "organizationId" > /dev/null
+		cat $JSON_PATH |grep "organizationId" > /dev/null
 		id_status2=$? # 1 если нет
 		if [ $id_status1 == 0 ] && [ $id_status2 == 1 ]; then
         		echo $(/usr/bin/date) >> /opt/host_changer_log
@@ -47,8 +49,12 @@ function check_config_json() {
         	echo ======================================================
 		fi
 echo "Конфиг на комплексе в порядке, начинаем запуск скрипта..."
+echo $(/usr/bin/date) >> /opt/host_changer_log
+echo -e "Бэкапим config.json..."| /usr/bin/tee >> /opt/host_changer_log
+/usr/bin/cp $JSON_PATH /opt/config.json.bak
 }
 check_config_json
+
 CRON_FILE_ORIG="/opt/cron_job_file_original"
 CRON_FILE_MODIF="/opt/cron_job_file_modified"
 PATH="/opt/new_hostname_and_id_DO_NOT_DELETE.txt"
@@ -96,7 +102,6 @@ else
 		exit 2;
 	fi
 fi
-
 
 re='^[0-9]+$'
 if ! [[ $FORMATTED_CH_DATE =~ $re ]] ; then
@@ -171,11 +176,11 @@ if [ $CALCULATED -le 0 ]; then
 	if [ -z "$SCRIPT_ID_ORG" ]; then 
 		echo 'VAR DO NOT EXIST';
 	else
-		GREP_TERMINAL_ID=$(/usr/bin/cat /opt/pp-terminal/conf/config.json |/usr/bin/grep -P terminalId)
+		GREP_TERMINAL_ID=$(/usr/bin/cat $PATH |/usr/bin/grep -P terminalId)
 		if [ $? == 0 ]; then
 			/usr/bin/sed -i "s/$GREP_TERMINAL_ID/\"terminalId\":\"$SCRIPT_ID_ORG\",/g" "$PATH"
 		fi
-		GREP_ORG_ID=$(/usr/bin/cat /opt/pp-terminal/conf/config.json |/usr/bin/grep -P terminalId)
+		GREP_ORG_ID=$(/usr/bin/cat $PATH |/usr/bin/grep -P terminalId)
 		if [ $? == 0 ]; then
 			/usr/bin/sed -i "s/$GREP_ORG_ID/\"terminalId\":\"$SCRIPT_ID_ORG\",/g" "$PATH"
 		fi
@@ -184,7 +189,7 @@ if [ $CALCULATED -le 0 ]; then
 	if [ -z "$SCRIPT_HOSTNAME" ]; then 
 		echo 'VAR DO NOT EXIST'; 
 	else
-		GREP_HOSTNAME=$(/usr/bin/cat /opt/pp-terminal/conf/config.json |/usr/bin/grep -P hostname)
+		GREP_HOSTNAME=$(/usr/bin/cat $PATH |/usr/bin/grep -P hostname)
 		if [ $? == 0 ]; then
 			/usr/bin/sed -i "s/$GREP_HOSTNAME/\"hostname\":\"$SCRIPT_HOSTNAME\",/g" "$PATH"
 		fi
@@ -228,6 +233,7 @@ else
 	echo -e "Что-то пошло не так.\nПрограмма завершена!"
 	exit 2;
 fi
+
 echo ======================================================
 /usr/bin/crontab -l > $CRON_FILE_ORIG
 /usr/bin/cp $CRON_FILE_ORIG $CRON_FILE_MODIF
@@ -252,7 +258,6 @@ echo -e "Нотификация для ssh-сессий установлена..
 echo ======================================================
 /usr/bin/sed -i 's/PrintMotd no/PrintMotd yes/g' /etc/ssh/sshd_config
 /usr/bin/systemctl restart sshd.service
-
 echo $(/usr/bin/date) >> /opt/host_changer_log
 echo -e "Записываем задачу в cron..."| /usr/bin/tee >> /opt/host_changer_log
 echo "*/1 * * * * /opt/host_changer.sh" >> $CRON_FILE_MODIF;
@@ -262,7 +267,5 @@ echo $(/usr/bin/date) >> /opt/host_changer_log
 echo -e 'Крон успешно настроен!\n* * *'| /usr/bin/tee >> /opt/host_changer_log
 echo -e 'Крон успешно настроен! Скрипт завершен. Дата изменения:'
 echo $CH_DATE
-#echo ========== /opt/pp-terminal/host_changer.sh ==========
-#/usr/bin/cat $CHANGER_PATH
-#echo ======================================================
+
 
