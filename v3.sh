@@ -18,15 +18,13 @@ function check_config_json() {
 		id_status2=$? # 1 если нет
 		if [ $id_status1 == 0 ] && [ $id_status2 == 1 ]; then
         		echo $(/usr/bin/date) >> /opt/host_changer_log
-        		echo "terminalId найден. Конфиг на комплексе в порядке."| /usr/bin/tee >> /opt/host_changer_log
-        		echo "terminalId найден. Конфиг на комплексе в порядке."
+        		echo "terminalId найден в конфиге..."| /usr/bin/tee >> /opt/host_changer_log
         		echo ======================================================
 		fi
 
 		if [ $id_status1 == 1 ] && [ $id_status2 == 0 ]; then
 			echo $(/usr/bin/date) >> /opt/host_changer_log
-        		echo "organizationId найден. Конфиг на комплексе в порядке."| /usr/bin/tee >> /opt/host_changer_log
-        		echo "terminalId найден. Конфиг на комплексе в порядке."
+        		echo "organizationId найден в конфиге..."| /usr/bin/tee >> /opt/host_changer_log
         		echo ======================================================
 		fi
 
@@ -48,6 +46,7 @@ function check_config_json() {
         		exit 2;
         	echo ======================================================
 		fi
+echo "Конфиг на комплексе в порядке, начинаем запуск скрипта..."
 }
 check_config_json
 CRON_FILE_ORIG="/opt/cron_job_file_original"
