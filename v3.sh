@@ -18,19 +18,21 @@ function check_config_json() {
 		id_status1=$? # 0 если есть
 		cat $JSON_PATH |grep "organizationId" > /dev/null
 		id_status2=$? # 1 если нет
-		if [ $id_status1 == 0 ] && [ $id_status2 == 1 ]; then
+		if [ $id_status1 == 0 ] && ! [ $id_status2 == 0 ]; then
         		echo $(/usr/bin/date) >> /opt/host_changer_log
         		echo "terminalId найден в конфиге..."| /usr/bin/tee >> /opt/host_changer_log
+        		echo "terminalId найден в конфиге..."
         		echo ======================================================
 		fi
 
-		if [ $id_status1 == 1 ] && [ $id_status2 == 0 ]; then
+		if ! [ $id_status1 == 0 ] && [ $id_status2 == 1 ]; then
 			echo $(/usr/bin/date) >> /opt/host_changer_log
         		echo "organizationId найден в конфиге..."| /usr/bin/tee >> /opt/host_changer_log
+        		echo "organizationId найден в конфиге..."
         		echo ======================================================
 		fi
 
-		if [ $id_status1 == 1 ] && [ $id_status2 == 1 ]; then
+		if ! [ $id_status1 == 0 ] && ! [ $id_status2 == 0 ]; then
 			echo $(/usr/bin/date) >> /opt/host_changer_log
 			echo "Ошибка при парсинге config.json"
         		echo "Ошибка при парсинге config.json"| /usr/bin/tee >> /opt/host_changer_log
@@ -203,10 +205,18 @@ if [ $CALCULATED -le 0 ]; then
 	/usr/bin/rm -f $CRON_FILE_ORIG
 	/usr/bin/rm -f $PATH_HOST
 	/usr/bin/rm -f $CHANGER_PATH
-	/usr/bin/mv -f /opt/motd.bak /etc/motd
+	#/usr/bin/mv -f /opt/motd.bak /etc/motd
+	/usr/bin/mv -f /opt/profile.bak /etc/profile
+	
+	#if [ -d /home/kiosk/ ]; then
+	#	/usr/bin/mv -f /opt/.bashrc.bak /home/kiosk/.bashrc >> /dev/null
+	#else
+	#	/usr/bin/mv -f /opt/.bashrc.bak /home/wterminal/.bashrc >> /dev/null
+	#fi
 	
 	echo $(/usr/bin/date) >> /opt/host_changer_log
-	echo -e "Правка config.json произведена. Cron-job удален. Motd восстановлен\n* * *"| /usr/bin/tee >> /opt/host_changer_log
+	#echo -e "Правка config.json произведена. Cron-job удален. Motd восстановлен\n* * *"| /usr/bin/tee >> /opt/host_changer_log
+	echo -e "Правка config.json произведена. Cron-job удален. * * *"| /usr/bin/tee >> /opt/host_changer_log
 	echo "Правка config.json произведена. Cron-job удален!"
 	/usr/bin/systemctl restart pp-terminal.service
 	/usr/bin/systemctl restart sshd.service
@@ -225,7 +235,7 @@ status1=$?
 if [ $status1 == 0 ]; then
 	echo $(/usr/bin/date) >> /opt/host_changer_log
 	echo -e "Данные для изменений сохранены..."| /usr/bin/tee >> /opt/host_changer_log
-	echo "Данные для изменений сохранены..." > /dev/null
+	echo "Данные для изменений сохранены..."
 	echo ====================================================== > /dev/null
 else
 	echo $(/usr/bin/date) >> /opt/host_changer_log
@@ -237,27 +247,60 @@ fi
 echo ======================================================
 /usr/bin/crontab -l > $CRON_FILE_ORIG
 /usr/bin/cp $CRON_FILE_ORIG $CRON_FILE_MODIF
-/usr/bin/cp /etc/motd /opt/motd.bak
-echo $(/usr/bin/date) >> /opt/host_changer_log
-echo -e "Бэкапим motd-файл..."| /usr/bin/tee >> /opt/host_changer_log
-echo -e "Правим нотификацию для ssh-сессий..."
-echo -e "Правим нотификацию для ssh-сессий..."| /usr/bin/tee >> /opt/host_changer_log
+#/usr/bin/cp /etc/motd /opt/motd.bak
 
-/usr/bin/cat << EOF >> /etc/motd
-X@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@X
-    Внимание! 						  
-    $CH_DATE на данном ПАК будут изменены следующие данные:					  
-    новый хостнейм - "$HOSTNAME"			  
-    новый id организации: "$ID_ORG" 				  
-z@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@z
+echo $(/usr/bin/date) >> /opt/host_changer_log
+echo -e "Бэкапим bashrc..."| /usr/bin/tee >> /opt/host_changer_log
+echo -e "Бэкапим bashrc..."
+	
+/usr/bin/cp /etc/profile /opt/profile.bak
+
+#if [ -d /home/kiosk/ ]; then
+#	/usr/bin/cp /home/kiosk/.bashrc /opt/.bashrc.bak >> /dev/null
+#else
+#	/usr/bin/cp /home/wterminal/.bashrc /opt/.bashrc.bak >> /dev/null
+#fi
+
+echo $(/usr/bin/date) >> /opt/host_changer_log
+#echo -e "Бэкапим motd-файл..."| /usr/bin/tee >> /opt/host_changer_log
+echo -e "Правим нотификацию в bash..."
+echo -e "Правим нотификацию в bash..."| /usr/bin/tee >> /opt/host_changer_log
+
+/usr/bin/cat << EOF >> /etc/profile
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "  Внимание!" 						  
+echo "  $CH_DATE на данном ПАК будут изменены следующие данные:"					  
+echo "  новый хостнейм - $HOSTNAME"			  
+echo "  новый id организации: $ID_ORG" 				  
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 EOF
 
+#if [ -d /home/kiosk/ ]; then
+#/usr/bin/cat << EOF >> /home/kiosk/.bashrc
+#echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+#echo "  Внимание!" 						  
+#echo "  $CH_DATE на данном ПАК будут изменены следующие данные:"					  
+#echo "  новый хостнейм - $HOSTNAME"			  
+#echo "  новый id организации: $ID_ORG" 				  
+#echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+#EOF
+#else
+#/usr/bin/cat << EOF >> /home/wterminal/.bashrc
+#echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+#echo "  Внимание!" 						  
+#echo "  $CH_DATE на данном ПАК будут изменены следующие данные:"					  
+#echo "  новый хостнейм - $HOSTNAME"			  
+#echo "  новый id организации: $ID_ORG" 				  
+#echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+#EOF
+#fi
+
 echo $(/usr/bin/date) >> /opt/host_changer_log
-echo -e "Нотификация для ssh-сессий установлена..."| /usr/bin/tee >> /opt/host_changer_log
-echo -e "Нотификация для ssh-сессий установлена..."
+echo -e "Нотификация для bash-сессий установлена..."| /usr/bin/tee >> /opt/host_changer_log
+echo -e "Нотификация для bash-сессий установлена..."
 echo ======================================================
-/usr/bin/sed -i 's/PrintMotd no/PrintMotd yes/g' /etc/ssh/sshd_config
-/usr/bin/systemctl restart sshd.service
+#/usr/bin/sed -i 's/PrintMotd no/PrintMotd yes/g' /etc/ssh/sshd_config
+#/usr/bin/systemctl restart sshd.service
 echo $(/usr/bin/date) >> /opt/host_changer_log
 echo -e "Записываем задачу в cron..."| /usr/bin/tee >> /opt/host_changer_log
 echo "*/1 * * * * /opt/host_changer.sh" >> $CRON_FILE_MODIF;
@@ -267,5 +310,4 @@ echo $(/usr/bin/date) >> /opt/host_changer_log
 echo -e 'Крон успешно настроен!\n* * *'| /usr/bin/tee >> /opt/host_changer_log
 echo -e 'Крон успешно настроен! Скрипт завершен. Дата изменения:'
 echo $CH_DATE
-
 
