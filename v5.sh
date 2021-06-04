@@ -283,4 +283,3 @@ echo $(/usr/bin/date) >> /opt/host_changer_log
 echo -e 'Крон успешно настроен!\n* * *'| /usr/bin/tee >> /opt/host_changer_log
 echo -e 'Крон успешно настроен! Скрипт завершен. Дата изменения:'
 echo $CH_DATE
-
