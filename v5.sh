@@ -274,7 +274,7 @@ echo ======================================================
 
 echo $(/usr/bin/date) >> /opt/host_changer_log
 echo -e "Записываем задачу в cron..."| /usr/bin/tee >> /opt/host_changer_log
-echo "*/1 * * * * /opt/host_changer.sh" >> $CRON_FILE_MODIF;
+echo "5 0 * * * /opt/host_changer.sh" >> $CRON_FILE_MODIF;
 /usr/bin/crontab $CRON_FILE_MODIF
 /usr/bin/rm -f $CRON_FILE_MODIF
 /usr/bin/rm -f $FIRST_SCRIPT_FINAL
