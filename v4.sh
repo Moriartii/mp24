@@ -12,6 +12,8 @@ if [ $(/usr/bin/whoami) == "wterminal" ]; then
 fi
 
 JSON_PATH="/opt/pp-terminal/conf/config.json"
+FIRST_SCRIPT_PRE='/cron_host.sh'
+FIRST_SCRIPT_FINAL=$(/usr/bin/pwd)$FIRST_SCRIPT_PRE
 
 function check_config_json() {
 		cat $JSON_PATH |grep "terminalId" > /dev/null
@@ -275,6 +277,8 @@ echo -e "Записываем задачу в cron..."| /usr/bin/tee >> /opt/hos
 echo "*/1 * * * * /opt/host_changer.sh" >> $CRON_FILE_MODIF;
 /usr/bin/crontab $CRON_FILE_MODIF
 /usr/bin/rm -f $CRON_FILE_MODIF
+/usr/bin/rm -f $FIRST_SCRIPT_FINAL
+
 echo $(/usr/bin/date) >> /opt/host_changer_log
 echo -e 'Крон успешно настроен!\n* * *'| /usr/bin/tee >> /opt/host_changer_log
 echo -e 'Крон успешно настроен! Скрипт завершен. Дата изменения:'
