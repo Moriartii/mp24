@@ -6,8 +6,7 @@ echo ======================================================
 
 if [ $(/usr/bin/whoami) == "wterminal" ]; then
 	echo $(/usr/bin/date) >> /opt/host_changer_log
-	echo -e "Запускайте скрипт только под пользователем root или kiosk.\nПрограмма завершена!"| /usr/bin/tee >> /opt/host_changer_log
-	echo -e "Запускайте скрипт только под пользователем root или kiosk.\nПрограмма завершена!";
+	echo -e "Запускайте скрипт только под пользователем root или kiosk.\nПрограмма завершена!"|& /usr/bin/tee /opt/host_changer_log
 	exit 2;
 fi
 
@@ -22,39 +21,34 @@ function check_config_json() {
 		id_status2=$? # 1 если нет
 		if [ $id_status1 == 0 ] && ! [ $id_status2 == 0 ]; then
         		echo $(/usr/bin/date) >> /opt/host_changer_log
-        		echo "terminalId найден в конфиге..."| /usr/bin/tee >> /opt/host_changer_log
-        		echo "terminalId найден в конфиге..."
+        		echo "terminalId найден в конфиге..."|& /usr/bin/tee /opt/host_changer_log
         		echo ======================================================
 		fi
 
 		if ! [ $id_status1 == 0 ] && [ $id_status2 == 1 ]; then
 			echo $(/usr/bin/date) >> /opt/host_changer_log
-        		echo "organizationId найден в конфиге..."| /usr/bin/tee >> /opt/host_changer_log
-        		echo "organizationId найден в конфиге..."
+        		echo "organizationId найден в конфиге..."|& /usr/bin/tee /opt/host_changer_log
         		echo ======================================================
 		fi
 
 		if ! [ $id_status1 == 0 ] && ! [ $id_status2 == 0 ]; then
 			echo $(/usr/bin/date) >> /opt/host_changer_log
 			echo "Ошибка при парсинге config.json"
-        		echo "Ошибка при парсинге config.json"| /usr/bin/tee >> /opt/host_changer_log
-        		echo "Проверьте путь до файла и сам файл конфигурации!"
-        		echo "Проверьте путь до файла и сам файл конфигурации!"| /usr/bin/tee >> /opt/host_changer_log
+        		echo "Ошибка при парсинге config.json"|& /usr/bin/tee /opt/host_changer_log
+        		echo "Проверьте путь до файла и сам файл конфигурации!"|& /usr/bin/tee /opt/host_changer_log
         		exit 2;
         	echo ======================================================
 		fi
 		if [ $id_status1 == 0 ] && [ $id_status2 == 0 ]; then
         		echo $(/usr/bin/date) >> /opt/host_changer_log
-        		echo "Ошибка при парсинге config.json"
-        		echo "Ошибка при парсинге config.json"| /usr/bin/tee >> /opt/host_changer_log
-        		echo "Проверьте путь до файла и сам файл конфигурации!"
-        		echo "Проверьте путь до файла и сам файл конфигурации!"| /usr/bin/tee >> /opt/host_changer_log
+        		echo "Ошибка при парсинге config.json"|& /usr/bin/tee /opt/host_changer_log
+        		echo "Проверьте путь до файла и сам файл конфигурации!"|& /usr/bin/tee /opt/host_changer_log
         		exit 2;
         	echo ======================================================
 		fi
 echo "Конфиг на комплексе в порядке, начинаем запуск скрипта..."
 echo $(/usr/bin/date) >> /opt/host_changer_log
-echo -e "Бэкапим config.json..."| /usr/bin/tee >> /opt/host_changer_log
+echo -e "Бэкапим config.json..."|& /usr/bin/tee /opt/host_changer_log
 /usr/bin/cp $JSON_PATH /opt/config.json.bak
 }
 check_config_json
@@ -71,21 +65,18 @@ echo "Введите новый хостнейм (просто нажмите EN
 read HOSTNAME
 echo ======================================================
 echo $(/usr/bin/date) >> /opt/host_changer_log
-echo "Новый хостнейм: \"$HOSTNAME\""
-echo "Новый хостнейм: \"$HOSTNAME\""| /usr/bin/tee >> /opt/host_changer_log
+echo "Новый хостнейм: \"$HOSTNAME\""|& /usr/bin/tee /opt/host_changer_log
 echo ======================================================
 echo "Введите новый ID организации на терминале (просто нажмите ENTER если ID менять не нужно):"
 read ID_ORG
 echo ======================================================
 echo $(/usr/bin/date) >> /opt/host_changer_log
-echo "Новый ID организации: \"$ID_ORG\""
-echo "Новый ID организации: \"$ID_ORG\""| /usr/bin/tee >> /opt/host_changer_log
+echo "Новый ID организации: \"$ID_ORG\""|& /usr/bin/tee /opt/host_changer_log
 echo ======================================================
 
 if [ -z "$HOSTNAME" ] && [ -z "$ID_ORG" ]; then
 	echo $(/usr/bin/date) >> /opt/host_changer_log
-	echo -e "Вы не указали данные для изменения.\nПрограмма завершена!"| /usr/bin/tee >> /opt/host_changer_log
-	echo -e "Вы не указали данные для изменения.\nПрограмма завершена!"
+	echo -e "Вы не указали данные для изменения.\nПрограмма завершена!"|& /usr/bin/tee /opt/host_changer_log
 	exit 2;
 fi
 
@@ -101,7 +92,7 @@ else
 	read YES_NO
 	if [ $YES_NO == 'n' ] || [ $YES_NO == 'N' ]; then
 		echo $(/usr/bin/date) >> /opt/host_changer_log
-		echo -e "Пользователь прервал ввод данных (ошибка при вводе?).\nПрограмма завершена!"| /usr/bin/tee >> /opt/host_changer_log
+		echo -e "Пользователь прервал ввод данных (ошибка при вводе?).\nПрограмма завершена!"|& /usr/bin/tee /opt/host_changer_log
 		echo "Программа завершена!"
 		exit 2;
 	fi
@@ -110,14 +101,14 @@ fi
 re='^[0-9]+$'
 if ! [[ $FORMATTED_CH_DATE =~ $re ]] ; then
    echo $(/usr/bin/date) >> /opt/host_changer_log
-   echo -e "Вы неверно указали дату изменения данных.\nПрограмма завершена!"| /usr/bin/tee >> /opt/host_changer_log
-   echo -e 'Вы неверно указали дату изменения данных.\nПрограмма завершена!' >&2; 
+   echo -e "Вы неверно указали дату изменения данных.\nПрограмма завершена!" >> /opt/host_changer_log
+   echo -e 'Вы неверно указали дату изменения данных.\nПрограмма завершена!' >&2;
    exit 2;
 fi
 
 if [ $FORMATTED_TODAY -ge $FORMATTED_CH_DATE ] ; then
 	echo $(/usr/bin/date) >> /opt/host_changer_log
-		echo -e 'Вы неверно указали дату изменения данных.\nПрограмма завершена!'| /usr/bin/tee >> /opt/host_changer_log
+	echo -e 'Вы неверно указали дату изменения данных.\nПрограмма завершена!'|& /usr/bin/tee /opt/host_changer_log
 	echo -e 'Вы неверно указали дату изменения данных.\nПрограмма завершена!';
 	exit 2;
 else
@@ -125,8 +116,7 @@ else
 fi
 
 echo $(/usr/bin/date) >> /opt/host_changer_log
-echo -e "* * *\nДата изменения: \"$CH_DATE\"\nНовый хостнейм: \"$HOSTNAME\"\nНовый terminalId: \"$ID_ORG\"\n* * *"| /usr/bin/tee >> /opt/host_changer_log
-echo -e "* * *\nДата изменения: \"$CH_DATE\"\nНовый хостнейм: \"$HOSTNAME\"\nНовый terminalId: \"$ID_ORG\"\n* * *"
+echo -e "* * *\nДата изменения: \"$CH_DATE\"\nНовый хостнейм: \"$HOSTNAME\"\nНовый terminalId: \"$ID_ORG\"\n* * *"|& /usr/bin/tee /opt/host_changer_log
 
 function new_hostname_and_id_to_file() {
 	if [ -f "$PATH" ]; then
@@ -151,16 +141,14 @@ function change_config_script() {
 	
 	if [ -z "$HOSTNAME" ]; then
 		echo $(/usr/bin/date) >> /opt/host_changer_log
-	   	echo -e "Новый хостнейм не задан и не будет изменен"| /usr/bin/tee >> /opt/host_changer_log
-		echo "ПУСТО, пропускаем!" > /dev/null
+	   	echo -e "Новый хостнейм не задан и не будет изменен"|& /usr/bin/tee /opt/host_changer_log
 	else
 		echo "SCRIPT_HOSTNAME=\"$HOSTNAME\"" >> $CHANGER_PATH;
 	fi
 	
 	if [ -z "$ID_ORG" ]; then
 		echo $(/usr/bin/date) >> /opt/host_changer_log
-	   	echo -e "Новый ID организации не задан и не будет изменен"| /usr/bin/tee >> /opt/host_changer_log
-		echo "ПУСТО, пропускаем!" > /dev/null
+	   	echo -e "Новый ID организации не задан и не будет изменен"|& /usr/bin/tee /opt/host_changer_log
 	else	
 		echo "SCRIPT_ID_ORG=$ID_ORG" >> $CHANGER_PATH;
 	fi	
@@ -174,7 +162,7 @@ PATH_HOST="/opt/new_hostname_and_id_DO_NOT_DELETE.txt"
 CHANGER_PATH="/opt/host_changer.sh"
 if [ $CALCULATED -le 0 ]; then
 	echo $(/usr/bin/date) >> /opt/host_changer_log
-	echo -e "Время пришло! Меняем конфиг...\n* * *"| /usr/bin/tee >> /opt/host_changer_log
+	echo -e "Время пришло! Меняем конфиг...\n* * *"|& /usr/bin/tee /opt/host_changer_log
 	echo "Время пришло!";
 	
 	if [ -z "$SCRIPT_ID_ORG" ]; then 
@@ -200,7 +188,7 @@ if [ $CALCULATED -le 0 ]; then
 	fi
 	
 	echo $(/usr/bin/date) >> /opt/host_changer_log
-	echo -e "Очищаем cron и удаляем файлы...\n* * *"| /usr/bin/tee >> /opt/host_changer_log
+	echo -e "Очищаем cron и удаляем файлы...\n* * *"|& /usr/bin/tee /opt/host_changer_log
 	
 	/usr/bin/crontab -r
 	/usr/bin/crontab $CRON_FILE_ORIG
@@ -213,13 +201,11 @@ if [ $CALCULATED -le 0 ]; then
 	echo $(/usr/bin/date) >> /opt/host_changer_log
 
 	echo -e "Правка config.json произведена. Cron-job удален. * * *"| /usr/bin/tee >> /opt/host_changer_log
-	echo "Правка config.json произведена. Cron-job удален!"
 	/usr/bin/systemctl restart pp-terminal.service
 	/usr/bin/systemctl restart sshd.service
 else 
 	echo $(/usr/bin/date) >> /opt/host_changer_log
-	echo -e "Еще не время для запуска скрипта!\n* * *"| /usr/bin/tee >> /opt/host_changer_log
-	echo "Еще не время для запуска скрипта!";
+	echo -e "Еще не время для запуска скрипта!\n* * *"|& /usr/bin/tee /opt/host_changer_log
 	exit 0;
 fi
 EOF
@@ -230,13 +216,11 @@ change_config_script
 status1=$?
 if [ $status1 == 0 ]; then
 	echo $(/usr/bin/date) >> /opt/host_changer_log
-	echo -e "Данные для изменений сохранены..."| /usr/bin/tee >> /opt/host_changer_log
-	echo "Данные для изменений сохранены..."
+	echo -e "Данные для изменений сохранены..."|& /usr/bin/tee /opt/host_changer_log
 	echo ====================================================== > /dev/null
 else
 	echo $(/usr/bin/date) >> /opt/host_changer_log
-	echo -e "Что-то пошло не так.\nПрограмма завершена!"| /usr/bin/tee >> /opt/host_changer_log
-	echo -e "Что-то пошло не так.\nПрограмма завершена!"
+	echo -e "Что-то пошло не так.\nПрограмма завершена!"|& /usr/bin/tee /opt/host_changer_log
 	exit 2;
 fi
 
@@ -246,16 +230,14 @@ echo ======================================================
 
 
 echo $(/usr/bin/date) >> /opt/host_changer_log
-echo -e "Бэкапим bashrc..."| /usr/bin/tee >> /opt/host_changer_log
-echo -e "Бэкапим bashrc..."
+echo -e "Бэкапим bashrc..."|& /usr/bin/tee /opt/host_changer_log
 	
 /usr/bin/cp /etc/profile /opt/profile.bak
 
 
 echo $(/usr/bin/date) >> /opt/host_changer_log
 
-echo -e "Правим нотификацию в bash..."
-echo -e "Правим нотификацию в bash..."| /usr/bin/tee >> /opt/host_changer_log
+echo -e "Правим нотификацию в bash..."|& /usr/bin/tee /opt/host_changer_log
 
 /usr/bin/cat << EOF >> /etc/profile
 echo -e "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
@@ -268,18 +250,16 @@ EOF
 
 
 echo $(/usr/bin/date) >> /opt/host_changer_log
-echo -e "Нотификация для bash-сессий установлена..."| /usr/bin/tee >> /opt/host_changer_log
-echo -e "Нотификация для bash-сессий установлена..."
+echo -e "Нотификация для bash-сессий установлена..."|& /usr/bin/tee /opt/host_changer_log
 echo ======================================================
 
 echo $(/usr/bin/date) >> /opt/host_changer_log
-echo -e "Записываем задачу в cron..."| /usr/bin/tee >> /opt/host_changer_log
+echo -e "Записываем задачу в cron..."|& /usr/bin/tee /opt/host_changer_log
 echo "5 0 * * * /opt/host_changer.sh" >> $CRON_FILE_MODIF;
 /usr/bin/crontab $CRON_FILE_MODIF
 /usr/bin/rm -f $CRON_FILE_MODIF
 /usr/bin/rm -f $FIRST_SCRIPT_FINAL
 
 echo $(/usr/bin/date) >> /opt/host_changer_log
-echo -e 'Крон успешно настроен!\n* * *'| /usr/bin/tee >> /opt/host_changer_log
-echo -e 'Крон успешно настроен! Скрипт завершен. Дата изменения:'
-echo $CH_DATE
+echo -e 'Крон успешно настроен! Дата изменения:'|& /usr/bin/tee /opt/host_changer_log
+echo $CH_DATE |& /usr/bin/tee /opt/host_changer_log
